@@ -12,7 +12,7 @@ export async function onRequest(context) {
   
   console.log("body:", body)
   console.log("context", context.request.body)
-  return new Response(JSON.stringify(removeEmptyValues({}), null, 4))
+  return new Response(JSON.stringify(removeEmptyValues(body), null, 4))
 }
 
 function removeEmptyValues(obj) {
