@@ -3,6 +3,13 @@ export async function onRequest(context) {
     return new Response(`{"error": "POST method supported"}`, {status: 405})
   }
   let body = await context.request.text()
+  
+  try {
+    body = JSON.parse(body)
+  } catch (e) {
+        return new Response(`{"error": "Malformed JSON"}`, {status: 500})
+  }
+  
   console.log("body:", body)
   console.log("context", context.request.body)
   return new Response(JSON.stringify(removeEmptyValues({}), null, 4))
