@@ -10,8 +10,6 @@ export async function onRequest(context) {
         return new Response(`{"error": "Malformed JSON"}`, {status: 500})
   }
   
-  console.log("body:", body)
-  console.log("context", context.request.body)
   return new Response(JSON.stringify(removeEmptyValues(body), null, 4))
 }
 
