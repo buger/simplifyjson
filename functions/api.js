@@ -4,7 +4,7 @@ export function onRequest(context) {
   }
   
   let body = context.request.json()
-  return new Response(JSON.serialize(removeEmptyValues(body), null, 4))
+  return new Response(JSON.stringify(removeEmptyValues(body), null, 4))
 }
 
 function removeEmptyValues(obj) {
