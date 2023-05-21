@@ -1,0 +1,191 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.2/codemirror.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.2/addon/lint/lint.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.2/mode/javascript/javascript.min.js"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.2/addon/display/placeholder.js'></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.2/addon/lint/lint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsonlint/1.6.0/jsonlint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.2/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.2/addon/lint/json-lint.min.js"></script>
+  <style>
+    body {
+      grid-template-columns: 1fr min(90%,90%) 1fr;
+    }
+    
+    .CodeMirror pre.CodeMirror-placeholder { color: #999; }
+
+    textarea {
+      padding: 5px;
+      height: 500px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    .CodeMirror {
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    #left, .cm-s-left.CodeMirror {
+      width: 49%;
+      float: left;
+    }
+
+    #right, .cm-s-right.CodeMirror {
+      width: 49%;
+      float: right;
+    }
+
+    a.left {
+      float: left;
+    }
+
+    a.right {
+      float: right;
+    }
+  </style>
+    <script>
+      function removeEmptyValues(obj) {
+  if (Array.isArray(obj)) {
+    return obj.map((item) => removeEmptyValues(item));
+  }
+
+  if (typeof obj === 'object' && obj !== null) {
+    const newObj = {};
+
+    for (const key in obj) {
+      const value = removeEmptyValues(obj[key]);
+
+      if (!value) {
+        continue
+      }
+
+      if (typeof value === 'object' && Object.keys(value).length === 0) {
+        continue; // Skip empty objects
+      }
+
+      newObj[key] = value;
+    }
+
+    return newObj;
+  }
+
+  return obj;
+}
+
+           function validateAndRemoveEmptyValues() {
+        const jsonInput = editor.getValue();
+        let parsedJSON;
+
+        try {
+          parsedJSON = JSON.parse(jsonInput);
+        } catch (error) {
+          outputEditor.setValue('Invalid JSON');
+          return;
+        }
+
+        const modifiedJSON = removeEmptyValues(parsedJSON);
+        outputEditor.setValue(JSON.stringify(
+          modifiedJSON,
+          null,
+          2
+        ));
+      }
+
+      function copyToClipboard() {
+        navigator.clipboard.writeText(outputEditor.getValue());
+      }
+
+      function loadExample() {
+         editor.setValue(JSON.stringify(JSON.parse(`{
+		"name": "John",
+		"age": 35,
+		"address": {
+			"street": "",
+			"city": "New York",
+			"state": null,
+			"zip": 0
+		},
+		"phoneNumbers": ["123-456-7890", "", "987-654-3210"],
+		"email": "",
+		"active": false,
+		"orders": [
+			{
+				"product": "Widget",
+				"price": 0,
+				"quantity": 2,
+				"options": {
+					"color": "",
+					"size": "large",
+					"material": null
+				}
+			},
+			{
+				"product": "Gadget",
+				"price": 19.99,
+				"quantity": 1
+			}
+		]
+	}`), null, 4))
+      validateAndRemoveEmptyValues()
+      }
+
+    </script>
+  </head>
+  <body>
+    <header>
+      <h1>JSON simplyfier</h1>
+      <p>Removes all null and empty values from your JSON</p>
+    </header>
+
+    <main>
+      <a href="javascript:;" class="left" onclick="loadExample()">Load example</a>
+      <a href="javascript:;" class="right" onclick="copyToClipboard()">Copy to clipboard</a>
+      <br/>
+      <textarea placeholder="Original JSON" id="left" oninput="validateAndRemoveEmptyValues()"></textarea>
+      <textarea placeholder="Resulting JSON without empty values" id="right" readonly></textarea>
+    </main>
+    <footer>
+      <p>2023. Contact the <a href="https://github.com/buger">author</a></p>
+    </footer>
+
+    <script>
+      const textarea = document.getElementById('left');
+      const textareaWidth = textarea.offsetWidth;
+      const textareaHeight = textarea.offsetHeight;
+      const editor = CodeMirror.fromTextArea(textarea, {
+        mode: "application/json",
+        lineNumbers: true,
+        gutters: ['CodeMirror-lint-markers'],
+        lint: false,
+        theme: "left",
+        lintOptions: {
+          schema: jsonlint.schema,
+        },
+      });
+
+      editor.getWrapperElement().style.width = `${textareaWidth}px`;
+      editor.getWrapperElement().style.height = `${textareaHeight}px`;
+
+      editor.on('change', function () {
+        editor.setOption("lint", editor.getValue().trim() );
+        validateAndRemoveEmptyValues()
+      });
+
+      const outputEditor = CodeMirror.fromTextArea(document.getElementById('right'), {
+        mode: 'application/json',
+        lineNumbers: true,
+        readOnly: true,
+        gutters: ['CodeMirror-lint-markers'],
+        lint: false,
+        theme: "right"
+      });
+      outputEditor.getWrapperElement().style.width = `${textareaWidth}px`;
+      outputEditor.getWrapperElement().style.height = `${textareaHeight}px`;
+
+    </script>
+  </body>
+</html>
