@@ -3,6 +3,8 @@ export async function onRequest(context) {
     return new Response(`{"error": "POST method supported"}`, {status: 405})
   }
   let body = await context.request.json()
+  console.log("body:", body)
+  console.log("context", context.request.body)
   return new Response(JSON.stringify(removeEmptyValues(body), null, 4))
 }
 
