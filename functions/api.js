@@ -3,7 +3,7 @@ export function onRequest(context) {
     return new Response(`{"error": "POST method supported"}`, {status: 405})
   }
   
-  let body = await context.request.json()
+  let body = context.request.json()
   return new Response(JSON.serialize(removeEmptyValues(body), null, 4))
 }
 
