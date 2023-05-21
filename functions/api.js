@@ -3,8 +3,7 @@ export function onRequest(context) {
     return new Response(`{"error": "POST method supported"}`, {status: 405})
   }
   
-  let body = JSON.parse(context.request.body)
-  return new Response(JSON.stringify(removeEmptyValues(body), null, 4))
+  return new Response(JSON.stringify(removeEmptyValues(context.request.body), null, 4))
 }
 
 function removeEmptyValues(obj) {
